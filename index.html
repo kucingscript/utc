@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UTC → Indonesia Time Converter</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        background: #f5f4f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "DM Sans", "Helvetica Neue", sans-serif;
+        padding: 32px 16px;
+        color: #1a1a1a;
+      }
+
+      .wrapper {
+        width: 100%;
+        max-width: 640px;
+      }
+
+      /* Header */
+      .header {
+        margin-bottom: 24px;
+      }
+      .header-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        color: #aaa;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .header-title {
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: #1a1a1a;
+      }
+
+      /* Cards */
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e8e6e1;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 12px;
+      }
+
+      /* Section label */
+      .section-label {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        color: #aaa;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+
+      /* Input section */
+      .input-section {
+        padding: 24px 24px 20px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .input-group {
+        flex: 1;
+      }
+      .input-group label {
+        display: block;
+        font-size: 11px;
+        color: #999;
+        margin-bottom: 6px;
+      }
+      .input-group input {
+        width: 100%;
+        padding: 10px 14px;
+        background: #f9f8f6;
+        border: 1.5px solid #e8e6e1;
+        border-radius: 10px;
+        font-family: inherit;
+        color: #1a1a1a;
+        transition: border-color 0.15s;
+      }
+      .input-group input:focus {
+        outline: none;
+        border-color: #1a1a1a;
+      }
+      #timeInput {
+        font-family: "DM Mono", monospace;
+        font-size: 20px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+      }
+      #dateInput {
+        font-size: 13px;
+      }
+      input[type="time"]::-webkit-calendar-picker-indicator,
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0.35;
+        cursor: pointer;
+      }
+
+      /* Zone buttons */
+      .zone-label {
+        display: block;
+        font-size: 11px;
+        color: #999;
+        margin-bottom: 8px;
+      }
+      .zone-buttons {
+        display: flex;
+        gap: 6px;
+      }
+      .zone-btn {
+        flex: 1;
+        padding: 8px 4px;
+        border-radius: 8px;
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        background: #f2f1ee;
+        color: #666;
+        transition: all 0.15s ease;
+        line-height: 1.2;
+      }
+      .zone-btn span {
+        display: block;
+        font-size: 9px;
+        opacity: 0.6;
+      }
+      .zone-btn:hover {
+        background: #e8e6e1;
+      }
+      .zone-btn.active {
+        background: #1a1a1a;
+        color: #fff;
+        font-weight: 600;
+        border-color: #1a1a1a;
+      }
+
+      /* Divider */
+      .divider {
+        height: 1px;
+        background: #f0eee9;
+        margin: 0 24px;
+      }
+
+      /* Result section */
+      .result-section {
+        padding: 20px 24px 24px;
+      }
+      .result-main {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+      .result-time-wrap {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .result-time {
+        font-family: "DM Mono", monospace;
+        font-size: 52px;
+        font-weight: 500;
+        color: #1a1a1a;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+      .day-shift {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 2px 8px;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        display: none;
+      }
+      .day-shift.next {
+        background: #fef3c7;
+        color: #d97706;
+      }
+      .day-shift.prev {
+        background: #eef2ff;
+        color: #6366f1;
+      }
+      .result-meta {
+        font-size: 13px;
+        color: #888;
+        margin-top: 8px;
+      }
+
+      .arrow-box {
+        text-align: right;
+        padding-bottom: 4px;
+      }
+      .arrow-box .az-from {
+        font-size: 11px;
+        color: #ccc;
+        margin-bottom: 2px;
+      }
+      .arrow-box .az-arrow {
+        font-size: 13px;
+        color: #ddd;
+      }
+      .arrow-box .az-to {
+        font-size: 11px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-top: 2px;
+      }
+
+      /* Reference table */
+      .table-header {
+        padding: 16px 24px 8px;
+      }
+      .zone-row {
+        display: flex;
+        align-items: center;
+        padding: 13px 24px;
+        border-top: 1px solid #f5f4f0;
+        transition: background 0.1s;
+      }
+      .zone-row:first-of-type {
+        border-top: none;
+      }
+      .zone-row.is-active {
+        background: #fafaf9;
+      }
+
+      .zr-badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        padding: 3px 7px;
+        border-radius: 5px;
+        width: 44px;
+        text-align: center;
+        background: #f2f1ee;
+        color: #444;
+      }
+      .zr-badge.utc {
+        background: #f2f1ee;
+        color: #888;
+      }
+      .zr-badge.act {
+        background: #1a1a1a;
+        color: #fff;
+      }
+
+      .zr-offset {
+        flex: 1;
+        padding-left: 14px;
+        font-size: 11px;
+        color: #bbb;
+      }
+      .zr-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .zr-shift {
+        font-size: 10px;
+      }
+      .zr-shift.next {
+        color: #d97706;
+      }
+      .zr-shift.prev {
+        color: #6366f1;
+      }
+      .zr-time {
+        font-family: "DM Mono", monospace;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: #1a1a1a;
+      }
+      .zr-time.utc {
+        color: #aaa;
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        font-size: 11px;
+        color: #c0bdb8;
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="header">
+        <p class="header-eyebrow">Time Converter</p>
+        <h1 class="header-title">UTC → Indonesia</h1>
+      </div>
+
+      <!-- Input Card -->
+      <div class="card">
+        <div class="input-section">
+          <p class="section-label">Input UTC</p>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="timeInput">Jam</label>
+              <input type="time" id="timeInput" value="09:00" />
+            </div>
+            <div class="input-group">
+              <label for="dateInput">Tanggal</label>
+              <input type="date" id="dateInput" />
+            </div>
+          </div>
+
+          <div>
+            <span class="zone-label">Zona Target</span>
+            <div class="zone-buttons">
+              <button class="zone-btn active" data-zone="WIB" data-offset="7">
+                WIB<span>UTC+7</span>
+              </button>
+              <button class="zone-btn" data-zone="WITA" data-offset="8">
+                WITA<span>UTC+8</span>
+              </button>
+              <button class="zone-btn" data-zone="WIT" data-offset="9">
+                WIT<span>UTC+9</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Result -->
+        <div class="result-section">
+          <p class="section-label">Hasil Konversi</p>
+          <div class="result-main">
+            <div>
+              <div class="result-time-wrap">
+                <span class="result-time" id="resultTime">16:00</span>
+                <span class="day-shift" id="dayShift"></span>
+              </div>
+              <p class="result-meta" id="resultMeta">WIB · UTC+7</p>
+            </div>
+            <div class="arrow-box">
+              <div class="az-from">UTC</div>
+              <div class="az-arrow">↓</div>
+              <div class="az-to" id="arrowTo">WIB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reference Table Card -->
+      <div class="card">
+        <div class="table-header">
+          <p class="section-label">Semua Zona</p>
+        </div>
+
+        <div id="zoneRows">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <p class="footer">
+        Ubah jam &amp; tanggal di atas — semua zona otomatis terupdate
+      </p>
+    </div>
+
+    <script>
+      const ZONES = [
+        { id: "UTC", label: "UTC", offset: 0, tag: "UTC+0" },
+        { id: "WIB", label: "WIB", offset: 7, tag: "UTC+7" },
+        { id: "WITA", label: "WITA", offset: 8, tag: "UTC+8" },
+        { id: "WIT", label: "WIT", offset: 9, tag: "UTC+9" },
+      ];
+
+      let activeZone = ZONES[1]; // default WIB
+
+      // ── helpers ────────────────────────────────────────────────────────────────
+      function pad(n) {
+        return String(n).padStart(2, "0");
+      }
+
+      function todayISO() {
+        const d = new Date();
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      }
+
+      function convert(timeStr, offsetHours) {
+        if (!timeStr || !timeStr.includes(":")) return "--:--";
+        const [h, m] = timeStr.split(":").map(Number);
+        if (isNaN(h) || isNaN(m)) return "--:--";
+        const total = (((h * 60 + m + offsetHours * 60) % 1440) + 1440) % 1440;
+        return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+      }
+
+      function dayDelta(timeStr, offsetHours) {
+        if (!timeStr || !timeStr.includes(":")) return 0;
+        const [h, m] = timeStr.split(":").map(Number);
+        if (isNaN(h) || isNaN(m)) return 0;
+        const total = h * 60 + m + offsetHours * 60;
+        if (total >= 1440) return 1;
+        if (total < 0) return -1;
+        return 0;
+      }
+
+      function formatDate(iso) {
+        if (!iso) return "";
+        const d = new Date(iso + "T00:00:00");
+        return d.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
+
+      // ── build reference rows ───────────────────────────────────────────────────
+      function buildRows() {
+        const container = document.getElementById("zoneRows");
+        container.innerHTML = "";
+        ZONES.forEach((z) => {
+          const row = document.createElement("div");
+          row.className =
+            "zone-row" + (z.id === activeZone.id ? " is-active" : "");
+          row.dataset.zone = z.id;
+
+          let badgeCls =
+            z.id === "UTC" ? "utc" : z.id === activeZone.id ? "act" : "";
+
+          row.innerHTML = `
+        <span class="zr-badge ${badgeCls}">${z.label}</span>
+        <span class="zr-offset">${z.tag}</span>
+        <div class="zr-right">
+          <span class="zr-shift" data-zone="${z.id}"></span>
+          <span class="zr-time ${z.id === "UTC" ? "utc" : ""}" data-zone="${z.id}">--:--</span>
+        </div>`;
+          container.appendChild(row);
+        });
+      }
+
+      // ── update display ─────────────────────────────────────────────────────────
+      function update() {
+        const timeStr = document.getElementById("timeInput").value;
+        const dateStr = document.getElementById("dateInput").value;
+
+        // Main result
+        const result = convert(timeStr, activeZone.offset);
+        const delta = dayDelta(timeStr, activeZone.offset);
+
+        document.getElementById("resultTime").textContent = result;
+        document.getElementById("arrowTo").textContent = activeZone.label;
+
+        const shiftEl = document.getElementById("dayShift");
+        shiftEl.style.display = "none";
+        shiftEl.classList.remove("next", "prev");
+        if (delta === 1) {
+          shiftEl.textContent = "besok";
+          shiftEl.classList.add("next");
+          shiftEl.style.display = "inline-block";
+        }
+        if (delta === -1) {
+          shiftEl.textContent = "kemarin";
+          shiftEl.classList.add("prev");
+          shiftEl.style.display = "inline-block";
+        }
+
+        let meta = `${activeZone.label} · ${activeZone.tag}`;
+        if (dateStr) meta += ` · ${formatDate(dateStr)}`;
+        document.getElementById("resultMeta").textContent = meta;
+
+        // Reference table times
+        ZONES.forEach((z) => {
+          const t = convert(timeStr, z.offset);
+          const d = dayDelta(timeStr, z.offset);
+
+          const timeEl = document.querySelector(
+            `.zr-time[data-zone="${z.id}"]`,
+          );
+          const shiftEl = document.querySelector(
+            `.zr-shift[data-zone="${z.id}"]`,
+          );
+          if (timeEl) timeEl.textContent = t;
+          if (shiftEl) {
+            shiftEl.textContent = d === 1 ? "besok" : d === -1 ? "kemarin" : "";
+            shiftEl.className =
+              "zr-shift" + (d === 1 ? " next" : d === -1 ? " prev" : "");
+          }
+
+          const row = document.querySelector(`.zone-row[data-zone="${z.id}"]`);
+          if (row) {
+            row.classList.toggle("is-active", z.id === activeZone.id);
+            const badge = row.querySelector(".zr-badge");
+            if (badge) {
+              badge.className =
+                "zr-badge" +
+                (z.id === "UTC"
+                  ? " utc"
+                  : z.id === activeZone.id
+                    ? " act"
+                    : "");
+            }
+          }
+        });
+      }
+
+      // ── zone button interaction ────────────────────────────────────────────────
+      document.querySelectorAll(".zone-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".zone-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeZone = ZONES.find((z) => z.id === btn.dataset.zone);
+          update();
+        });
+      });
+
+      document.getElementById("timeInput").addEventListener("input", update);
+      document.getElementById("dateInput").addEventListener("input", update);
+
+      // ── init ───────────────────────────────────────────────────────────────────
+      document.getElementById("dateInput").value = todayISO();
+      buildRows();
+      update();
+    </script>
+  </body>
+</html>
